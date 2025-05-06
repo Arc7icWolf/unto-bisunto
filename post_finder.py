@@ -3,10 +3,10 @@ import requests
 import json
 from datetime import datetime, timedelta
 import re
-import markdown
-from bs4 import BeautifulSoup
-from langdetect import detect_langs, LangDetectException as Lang_e
 import logging
+import sys
+from beem import Hive
+import json
 
 
 # logger
@@ -103,9 +103,9 @@ def has_voted_poll(last_polls, author, session: requests.Session):
 # Found and check eligible posts published in the last 7 days in the target community
 def eligible_posts(session: requests.Session):
     today = datetime.now()
-    seven_days = today - timedelta(days=6, hours=23)
+    one_day = today - timedelta(days=1)
 
-    less_than_seven_days = True
+    less_than_one_day = True
 
     entries = []
     authors_stats = []
@@ -114,7 +114,7 @@ def eligible_posts(session: requests.Session):
     permlink = ""
     i = 1
 
-    while less_than_seven_days:
+    while less_than_one_day:
         # Get posts published in the target community
         data = (
             f'{{"jsonrpc":"2.0", "method":"bridge.get_ranked_posts", '
@@ -124,22 +124,57 @@ def eligible_posts(session: requests.Session):
         )
         posts = get_response(data, session)
         for post in posts:
+            is_pinned = post.get("stats", {}).get("is_pinned", [])
+            tags = post['json_metadata']['tags']
+            created = post["created"]
+
+            if is_pinned:
+                continue  # Skip pinned posts, if any
+
+            if "untobisunto" not in tags:
+                continue
+
+            created_formatted = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S")
+            if created_formatted < one_day:
+                less_than_one_day = False
+                print("No more posts less than one day older found")
+                break  # Stop if post is more than 1 day old
+
+            print(post["title"])
+            continue
+
+            sys.exit()
+
+
+
+            hive = Hive(keys=['xxxxxxxxxxxxx'])
+
+            hive.vote(weight=weight, account=account, identifier=authorperm)
+
+            hive.post(
+                title=title,
+                body=body,
+                author=author,
+                permlink=None,
+                reply_identifier=None,
+                json_metadata=json.dumps({"tags": tags}),
+                community=None,
+                app=None,
+                beneficiaries=None
+            )
+
+
             author = post["author"]
             body = post["body"]
             created = post["created"]
             permlink = post["permlink"]
             title = post["title"]
-            is_pinned = post.get("stats", {}).get("is_pinned", [])
+            
             beneficiaries = post["beneficiaries"]
 
-            if is_pinned:
-                continue  # Skip pinned posts, if any
 
-            created_formatted = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S")
-            if created_formatted < seven_days:
-                less_than_seven_days = False
-                print("No more posts less than seven days older found")
-                break  # Stop if post is more than 7 days old
+
+
 
             cleaned_body = clean_text(body)
 
@@ -210,8 +245,6 @@ def main():
         logger.error(f"JSON decode error or missing key: {e}")
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-
-    update_winners_list(session)
 
     elapsed_time = time.time() - start
     print(f"Work completed in {elapsed_time:.2f} seconds")
