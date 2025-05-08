@@ -6,13 +6,14 @@ import re
 import logging
 import sys
 from beem import Hive
+from beem.comment import Comment
 import json
 
 
-HIVE = Hive(keys=['xxxxxxxxxxxxx'])
-ACCOUNT = "xxxxx"
-WEIGTH = 100.0
-BODY = "Upvote e reblog!"
+HIVE = Hive(keys=['xxxxxxx'])
+ACCOUNT = "wolf-lord"
+WEIGTH = 1.0
+BODY = "Test" # da cambiare, forse serve jina2
 
 
 # logger
@@ -50,22 +51,27 @@ def get_response(data, session: requests.Session):
 
 def cast_vote(authorperm):
     HIVE.vote(weight=WEIGTH, account=ACCOUNT, identifier=authorperm)
-    print(f"Vote casted on {authorperm}")
+    print(f"Vote casted on {authorperm}. Sleeping for 3 sec...")
+    time.sleep(3)
 
 
 def leave_comment(authorperm):
     HIVE.post(
+        title="",
         body=BODY,
         author=ACCOUNT,
-        permlink=authorperm,
-        reply_identifier=None,
+        permlink=None,
+        reply_identifier=authorperm,
     )
-    print(f"Comment left on {permlink}")
+    print(f"Comment left on {authorperm}. Sleeping for 3 sec...")
+    time.sleep(3)
 
 
 def reblog(authorperm):
-    HIVE.resteem(identifier=authorperm, account=ACCOUNT)
-    print(f"Reblogged {authorperm}")
+    reblog = Comment(authorperm=authorperm, blockchain_instance=HIVE)
+    reblog.resteem(account=ACCOUNT)
+    print(f"Reblogged {authorperm}. Sleeping for 3 sec...")
+    time.sleep(3)
 
 
 # Found and check eligible posts published in the last 7 days in the target community
@@ -98,6 +104,8 @@ def unto_bisunto_posts(session: requests.Session):
             if is_pinned:
                 continue
 
+            '''
+
             if "untobisunto" not in tags:
                 continue
 
@@ -107,17 +115,28 @@ def unto_bisunto_posts(session: requests.Session):
                 print("No more posts less than one day older found")
                 break  # Stop if post is more than 1 day old
 
+            '''
+
+            if author != "arc7icwolf": # for testing purpose
+                continue
+
             authorperm = f"{author}/{permlink}"
 
-            cast_vote(authorperm)
-            leave_comment(authorperm)
+            # cast_vote(authorperm) # funziona ma serve introdurre controllo per il caso in cui post sia già stato votato
+            # leave_comment(authorperm) # funziona, ma vale la pena introdurre un controllo per evitare di commentare due volte
             reblog(authorperm)
       
             print(post["title"])
+
+            sys.exit()
             continue
 
 
 def main():
+
+    #print(help(Hive))
+    #sys.exit()
+
     try:
         with requests.Session() as session:
             unto_bisunto_posts(session)
