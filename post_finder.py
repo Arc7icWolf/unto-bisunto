@@ -2,18 +2,18 @@ import time
 import requests
 import json
 from datetime import datetime, timedelta
-import re
 import logging
 import sys
 from beem import Hive
 from beem.comment import Comment
-import json
 
 
-HIVE = Hive(keys=['xxxxxxx'])
-ACCOUNT = "wolf-lord"
-WEIGTH = 1.0
-BODY = "Test" # da cambiare, forse serve jina2
+class Config:
+    def __init__(self):
+        self.hive = Hive(keys=["xxx"])
+        self.account = "xxxx"
+        self.weight = 1.0
+        self.body = "Test"  # da cambiare, forse serve jinja2
 
 
 # logger
@@ -36,7 +36,7 @@ def get_response(data, session: requests.Session):
         "https://api.deathwing.me",
         "https://api.hive.blog",
         "https://hive-api.arcange.eu",
-        "https://api.openhive.network"
+        "https://api.openhive.network",
     ]
     for url in urls:
         request = requests.Request("POST", url=url, data=data).prepare()
@@ -46,36 +46,40 @@ def get_response(data, session: requests.Session):
         response = response_json.json().get("result", [])
         if len(response) == 0:
             logger.warning(f"{response_json.json()} from this {data}")
+            return []
         return response
 
 
-def cast_vote(authorperm):
-    HIVE.vote(weight=WEIGTH, account=ACCOUNT, identifier=authorperm)
+def cast_vote(authorperm, cfg: Config):
+    voted = cfg.hive.vote(weight=cfg.weight, account=cfg.account, identifier=authorperm)
     print(f"Vote casted on {authorperm}. Sleeping for 3 sec...")
     time.sleep(3)
+    return True if voted else False
 
 
-def leave_comment(authorperm):
-    HIVE.post(
+def leave_comment(authorperm, cfg: Config):
+    commented = cfg.hive.post(
         title="",
-        body=BODY,
-        author=ACCOUNT,
+        body=cfg.body,
+        author=cfg.account,
         permlink=None,
         reply_identifier=authorperm,
     )
     print(f"Comment left on {authorperm}. Sleeping for 3 sec...")
     time.sleep(3)
+    return True if commented else False
 
 
-def reblog(authorperm):
-    reblog = Comment(authorperm=authorperm, blockchain_instance=HIVE)
-    reblog.resteem(account=ACCOUNT)
+def reblog(authorperm, cfg: Config):
+    reblog = Comment(authorperm=authorperm, blockchain_instance=cfg.hive)
+    reblogged = reblog.resteem(account=cfg.account)
     print(f"Reblogged {authorperm}. Sleeping for 3 sec...")
     time.sleep(3)
+    return True if reblogged else False
 
 
-# Found and check eligible posts published in the last 7 days in the target community
-def unto_bisunto_posts(session: requests.Session):
+# Found and check eligible posts published in the last day in the target community
+def unto_bisunto_posts(session: requests.Session, cfg: Config):
     today = datetime.now()
     one_day = today - timedelta(days=1, hours=1)
 
@@ -83,7 +87,6 @@ def unto_bisunto_posts(session: requests.Session):
 
     author = ""
     permlink = ""
-
 
     while less_than_one_day:
         # Get posts published in the target community
@@ -95,54 +98,61 @@ def unto_bisunto_posts(session: requests.Session):
         )
         posts = get_response(data, session)
         for post in posts:
-            is_pinned = post.get("stats", {}).get("is_pinned", [])
-            tags = post['json_metadata']['tags']
-            created = post["created"]
             author = post["author"]
             permlink = post["permlink"]
 
+            is_pinned = post.get("stats", {}).get("is_pinned", [])
             if is_pinned:
                 continue
 
-            '''
-
-            if "untobisunto" not in tags:
-                continue
-
+            created = post["created"]
             created_formatted = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S")
             if created_formatted < one_day:
                 less_than_one_day = False
                 print("No more posts less than one day older found")
                 break  # Stop if post is more than 1 day old
 
-            '''
+            tags = post["json_metadata"].get("tags", [])
+            if "untobisunto" not in tags:
+                continue
 
+            votes = post.get("active_votes", [])
+            if any(vote["voter"] == cfg.account for vote in votes):
+                continue
+
+            """
             if author != "arc7icwolf": # for testing purpose
                 continue
+            """
 
             authorperm = f"{author}/{permlink}"
 
-            # cast_vote(authorperm) # funziona ma serve introdurre controllo per il caso in cui post sia già stato votato
-            # leave_comment(authorperm) # funziona, ma vale la pena introdurre un controllo per evitare di commentare due volte
-            reblog(authorperm)
-      
-            print(post["title"])
+            voted = cast_vote(authorperm, cfg)
+            if voted is False:
+                logger.warning(f"unable to vote on {authorperm}")
 
-            sys.exit()
-            continue
+            commented = leave_comment(authorperm, cfg)
+            if commented is False:
+                logger.warning(f"unable to comment on {authorperm}")
+
+            reblogged = reblog(authorperm, cfg)
+            if reblogged is False:
+                logger.warning(f"unable to vote on {authorperm}")
 
 
 def main():
 
-    #print(help(Hive))
-    #sys.exit()
+    # print(help(Hive))
+    # sys.exit()
+
+    config = Config()
 
     try:
         with requests.Session() as session:
-            unto_bisunto_posts(session)
+            unto_bisunto_posts(session, config)
     except (json.JSONDecodeError, KeyError) as e:
         logger.error(f"JSON decode error or missing key: {e}")
-    #except Exception as e:
+    # except Exception as e:
     #    logger.error(f"An error occurred: {e}")
 
 
