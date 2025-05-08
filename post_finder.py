@@ -6,6 +6,8 @@ import logging
 import sys
 from beem import Hive
 from beem.comment import Comment
+import os
+import jinja2
 
 
 class Config:
@@ -13,7 +15,18 @@ class Config:
         self.hive = Hive(keys=["xxx"])
         self.account = "xxxx"
         self.weight = 1.0
-        self.body = "Test"  # da cambiare, forse serve jinja2
+        self.body_template = self.load_template("comment_1.template")
+
+    def load_template(self, filename):
+        template_path = os.path.join("templates", filename)
+        with open(template_path, "r", encoding="utf-8") as file:
+            return jinja2.Template(file.read())
+
+    def render_body(self, target_account, author_account):
+        return self.body_template.render(
+            target_account=target_account,
+            author_account=author_account
+        )
 
 
 # logger
@@ -57,10 +70,11 @@ def cast_vote(authorperm, cfg: Config):
     return True if voted else False
 
 
-def leave_comment(authorperm, cfg: Config):
+def leave_comment(author, authorperm, cfg: Config):
+    body = cfg.render_body(target_account=author, author_account=cfg.account)
     commented = cfg.hive.post(
         title="",
-        body=cfg.body,
+        body=body,
         author=cfg.account,
         permlink=None,
         reply_identifier=authorperm,
@@ -131,7 +145,7 @@ def unto_bisunto_posts(session: requests.Session, cfg: Config):
             if voted is False:
                 logger.warning(f"unable to vote on {authorperm}")
 
-            commented = leave_comment(authorperm, cfg)
+            commented = leave_comment(author, authorperm, cfg)
             if commented is False:
                 logger.warning(f"unable to comment on {authorperm}")
 
