@@ -12,8 +12,8 @@ import jinja2
 
 class Config:
     def __init__(self):
-        self.hive = Hive(keys=["xxx"])
-        self.account = "xxxx"
+        self.hive = Hive(keys=["5JdmTY4Pw4br6sGPmyFkcXcLW2QqDi4Kh94d5fXc1rxha1LNedo"])
+        self.account = "wolf-lord"
         self.weight = 1.0
         self.body_template = self.load_template("comment_1.template")
 
@@ -118,26 +118,26 @@ def unto_bisunto_posts(session: requests.Session, cfg: Config):
             is_pinned = post.get("stats", {}).get("is_pinned", [])
             if is_pinned:
                 continue
-
+            
             created = post["created"]
             created_formatted = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S")
             if created_formatted < one_day:
                 less_than_one_day = False
                 print("No more posts less than one day older found")
                 break  # Stop if post is more than 1 day old
-
+            
             tags = post["json_metadata"].get("tags", [])
             if "untobisunto" not in tags:
                 continue
-
+            
             votes = post.get("active_votes", [])
             if any(vote["voter"] == cfg.account for vote in votes):
                 continue
 
-            """
+            '''
             if author != "arc7icwolf": # for testing purpose
                 continue
-            """
+            '''
 
             authorperm = f"{author}/{permlink}"
 

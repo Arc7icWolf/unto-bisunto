@@ -1,4 +1,12 @@
-<center><p>Ciao @{{target_account}}, ho fatto il reblog della tua entry per il contest #untobisunto!</p></center>
+<p>🎉 Ciao @{{target_account}}! Ho appena fatto il reblog della tua entry per il contest <strong>#untobisunto</strong> — complimenti per il tuo contributo!</p>
+
 <br>
-<center><p>Puoi visualizzare e supportare i post di tutti i partecipanti seguendo @{{author_account}}
-     o recandoti a questa pagina [peakd.com/@{{author_account}}/feed](https://peakd.com/@{{author_account}}/feed).</p></center>
+
+<p>Se vuoi dare un’occhiata anche agli altri partecipanti e supportare i loro post, puoi seguire @{{author_account}} oppure visitare questa pagina:</p>
+<p><a href="https://peakd.com/@{{author_account}}/feed" target="_blank">🔗 peakd.com/@{{author_account}}/feed</a></p>
+
+
+<img src="https://files.peakd.com/file/peakd-hive/arc7icwolf/23xL2wvSikAMtg8y8fa1xWKHLsxQnxtsiKQurmLJhHGDRHZrsDREwvX9Rr6xsvdpQcJgt.jpg"/>
+
+<center><p><sub>immagine di proprietà della community Olio di Balena</sub></p><center>
+
