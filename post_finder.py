@@ -12,8 +12,13 @@ import jinja2
 
 class Config:
     def __init__(self):
-        self.hive = Hive(keys=[""])
-        self.account = ""
+        # Get credentias from Secrets
+        key = os.getenv("HIVE_ACTIVE_KEY")
+        if not key:
+            raise ValueError("HIVE_ACTIVE_KEY not found")
+            
+        self.hive = Hive(keys=[key])
+        self.account = "megaptera-marina"
         self.weight = 1.0
         self.body_template = self.load_template("comment_1.template")
 
