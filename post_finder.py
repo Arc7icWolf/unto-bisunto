@@ -13,10 +13,10 @@ import jinja2
 class Config:
     def __init__(self):
         # Get credentias from Secrets
-        key = os.getenv("HIVE_ACTIVE_KEY")
+        key = os.getenv("POSTING_KEY")
         if not key:
-            raise ValueError("HIVE_ACTIVE_KEY not found")
-            
+            raise ValueError("POSTING_KEY not found")
+
         self.hive = Hive(keys=[key])
         self.account = "megaptera-marina"
         self.weight = 1.0
