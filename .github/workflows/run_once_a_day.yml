@@ -1,0 +1,36 @@
+name: Run Script Once a Day
+
+on:
+  schedule:
+    - cron: "0 18 * * *"  # Every day at 18.00 UTC
+  workflow_dispatch:  # Manul start allowed
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Cache Python dependencies # Cache to avoid installing libraries at each run
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || true  # Avoid errors if file doesn't exist
+
+      - name: Run script
+        env:
+          POSTING_KEY: ${{ secrets.POSTING_KEY }}
+        run: python post_finder.py
