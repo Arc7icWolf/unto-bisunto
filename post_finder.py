@@ -12,8 +12,8 @@ import jinja2
 
 class Config:
     def __init__(self):
-        self.hive = Hive(keys=["5JdmTY4Pw4br6sGPmyFkcXcLW2QqDi4Kh94d5fXc1rxha1LNedo"])
-        self.account = "wolf-lord"
+        self.hive = Hive(keys=[""])
+        self.account = ""
         self.weight = 1.0
         self.body_template = self.load_template("comment_1.template")
 
@@ -24,8 +24,7 @@ class Config:
 
     def render_body(self, target_account, author_account):
         return self.body_template.render(
-            target_account=target_account,
-            author_account=author_account
+            target_account=target_account, author_account=author_account
         )
 
 
@@ -57,7 +56,7 @@ def get_response(data, session: requests.Session):
         if response_json.status_code == 502:
             continue
         response = response_json.json().get("result", [])
-        if len(response) == 0:
+        if len(response) == 0 or not response:
             logger.warning(f"{response_json.json()} from this {data}")
             return []
         return response
@@ -118,26 +117,26 @@ def unto_bisunto_posts(session: requests.Session, cfg: Config):
             is_pinned = post.get("stats", {}).get("is_pinned", [])
             if is_pinned:
                 continue
-            
+
             created = post["created"]
             created_formatted = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S")
             if created_formatted < one_day:
                 less_than_one_day = False
                 print("No more posts less than one day older found")
                 break  # Stop if post is more than 1 day old
-            
+
             tags = post["json_metadata"].get("tags", [])
             if "untobisunto" not in tags:
                 continue
-            
+
             votes = post.get("active_votes", [])
             if any(vote["voter"] == cfg.account for vote in votes):
                 continue
 
-            '''
+            """
             if author != "arc7icwolf": # for testing purpose
                 continue
-            '''
+            """
 
             authorperm = f"{author}/{permlink}"
 
@@ -153,11 +152,12 @@ def unto_bisunto_posts(session: requests.Session, cfg: Config):
             if reblogged is False:
                 logger.warning(f"unable to vote on {authorperm}")
 
+            if voted and commented and reblogged:
+                logger.info(f"{authorperm} has been upvoted, commentend and reblogged")
+                print(authorperm)
+
 
 def main():
-
-    # print(help(Hive))
-    # sys.exit()
 
     config = Config()
 
@@ -166,8 +166,8 @@ def main():
             unto_bisunto_posts(session, config)
     except (json.JSONDecodeError, KeyError) as e:
         logger.error(f"JSON decode error or missing key: {e}")
-    # except Exception as e:
-    #    logger.error(f"An error occurred: {e}")
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
