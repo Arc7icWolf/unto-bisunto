@@ -8,6 +8,7 @@ from beem import Hive
 from beem.comment import Comment
 import os
 import jinja2
+import random
 
 
 class Config:
@@ -20,7 +21,23 @@ class Config:
         self.hive = Hive(keys=[key])
         self.account = "megaptera-marina"
         self.weight = 1.0
-        self.body_template = self.load_template("comment_1.template")
+
+        templates = [
+            "comment_0.template",
+            "comment_1.template",
+            "comment_2.template",
+            "comment_3.template",
+            "comment_4.template",
+            "comment_5.template",
+            "comment_6.template",
+            "comment_7.template",
+            "comment_8.template",
+            "comment_9.template"
+        ]
+
+        chosen_template = random.choice(templates)
+
+        self.body_template = self.load_template(chosen_template)
 
     def load_template(self, filename):
         template_path = os.path.join("templates", filename)
