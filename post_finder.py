@@ -2,7 +2,7 @@ import time
 import requests
 import json
 from datetime import datetime, timedelta
-import logging
+from logger import logger
 import sys
 from beem import Hive
 from beem.comment import Comment
@@ -48,20 +48,6 @@ class Config:
         return self.body_template.render(
             target_account=target_account, author_account=author_account
         )
-
-
-# logger
-def get_logger():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    handler = logging.FileHandler("post_finder.log", mode="a")
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
-
-
-logger = get_logger()
 
 
 # Send request, get response, return decoded JSON response
