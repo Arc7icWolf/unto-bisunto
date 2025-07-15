@@ -26,8 +26,9 @@ def get_response(data, session: requests.Session):
         return response
 
 
-def transfers(author, num, session: requests.Session):
+def transfers(author, last_index, session: requests.Session):
     winners_list = []
+    num = -1
     while True:
         data = (
             f'{{"jsonrpc":"2.0", "method":"condenser_api.get_account_history", '
@@ -35,13 +36,14 @@ def transfers(author, num, session: requests.Session):
         )
         transfers = get_response(data, session)
 
-        if not transfers:
+        if len(transfers) == 0:
             return winners_list
 
-        for transfer in transfers:
+        for transfer in transfers[::-1]:
+            if transfer[0] == last_index:
+                return winners_list
             tx_data = transfer[1]["op"]
             if tx_data[0] == "transfer" and tx_data[1]["from"] == author:
-                print(tx_data[1])
                 if tx_data[1]["to"] == "fedesox":
                     continue
                 winners_list.append(
@@ -51,9 +53,8 @@ def transfers(author, num, session: requests.Session):
                         "amount": tx_data[1]["amount"],
                     }
                 )
-                return winners_list
 
-        num += 1000
+        num = transfers[0][0]
 
 
 def save_winners(winners):
@@ -72,15 +73,16 @@ def save_winners(winners):
 
 
 def contest_data(author, session):
-    num = 1000
     if os.path.exists("winners.csv"):
         with open("winners.csv", "r", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
             rows = list(reader)
             if rows:
-                num += int(rows[-1]["num"])
+                last_index = int(rows[0]["num"])
+    else:
+        last_index = 1
 
-    winners = transfers(author, num, session)
+    winners = transfers(author, last_index, session)
     save_winners(winners)
 
 
