@@ -9,6 +9,8 @@ from beem.comment import Comment
 import os
 import jinja2
 import random
+from data import contest_data
+from stats import get_stats
 
 
 class Config:
@@ -32,7 +34,7 @@ class Config:
             "comment_6.template",
             "comment_7.template",
             "comment_8.template",
-            "comment_9.template"
+            "comment_9.template",
         ]
 
         chosen_template = random.choice(templates)
@@ -44,9 +46,11 @@ class Config:
         with open(template_path, "r", encoding="utf-8") as file:
             return jinja2.Template(file.read())
 
-    def render_body(self, target_account, author_account):
+    def render_body(self, target_account, author_account, info):
         return self.body_template.render(
-            target_account=target_account, author_account=author_account
+            target_account=target_account,
+            author_account=author_account,
+            random_info=info,
         )
 
 
@@ -77,8 +81,10 @@ def cast_vote(authorperm, cfg: Config):
     return True if voted else False
 
 
-def leave_comment(author, authorperm, cfg: Config):
-    body = cfg.render_body(target_account=author, author_account=cfg.account)
+def leave_comment(author, authorperm, info, cfg: Config):
+    body = cfg.render_body(
+        target_account=author, author_account=cfg.account, random_info=info
+    )
     commented = cfg.hive.post(
         title="",
         body=body,
@@ -152,7 +158,9 @@ def unto_bisunto_posts(session: requests.Session, cfg: Config):
             if voted is False:
                 logger.warning(f"unable to vote on {authorperm}")
 
-            commented = leave_comment(author, authorperm, cfg)
+            contest_data(cfg.account, session)
+            info = get_stats(random.randint(1, 5))
+            commented = leave_comment(author, authorperm, info, cfg)
             if commented is False:
                 logger.warning(f"unable to comment on {authorperm}")
 

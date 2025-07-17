@@ -2,6 +2,10 @@
 
 <br>
 
+<p>{{random_info}}</p>
+
+<br>
+
 <p>Se vuoi dare un’occhiata anche agli altri partecipanti e supportare i loro post, puoi seguire @{{author_account}} oppure visitare questa pagina:</p>
 <p><a href="https://peakd.com/@{{author_account}}" target="_blank">🔗 peakd.com/@{{author_account}}</a></p>
 

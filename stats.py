@@ -7,8 +7,8 @@ from collections import defaultdict
 def total_prizes(reader: csv.DictReader) -> str:
     total = 0
     for row in reader:
-        total += float(row['amount'].split()[0])
-        
+        total += float(row["amount"].split()[0])
+
     return (
         f"Sapevi che il contest **Unto&Bisunto** ha distribuito premi "
         f"per un totale di {total:.3f} HIVE? Impressionante!"
@@ -17,7 +17,7 @@ def total_prizes(reader: csv.DictReader) -> str:
 
 def all_winners(reader: csv.DictReader) -> list:
     totals = defaultdict(float)
-    
+
     for row in reader:
         to = row["to"]
         totals[to] += float(row["amount"].split()[0])
@@ -58,23 +58,23 @@ def participants(reader: csv.DictReader) -> str:
     )
 
 
-def stats(num: str) -> str:
+def get_stats(num: int) -> str:
     if os.path.exists("winners.csv"):
         with open("winners.csv", "r", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
             if not reader:
                 return ""
             match num:
-                case "1":
+                case 1:
                     return total_prizes(reader)
-                case "2":
+                case 2:
                     return most_rewarded(reader)
-                case "3":
+                case 3:
                     return second_most_rewarded(reader)
-                case "4":
+                case 4:
                     return third_most_rewarded(reader)
-                case "5":
-                    print(participants(reader))
+                case 5:
+                    return participants(reader)
                 case _:
                     return ""
 
@@ -83,6 +83,5 @@ def stats(num: str) -> str:
 
 
 if __name__ == "__main__":
-    num = "5"
-    stats(num)
-    
+    num = 5
+    get_stats(num)

@@ -1,5 +1,8 @@
 <p>🎉 Ehi @{{target_account}}! Il tuo post per il contest <strong>#untobisunto</strong> è stato appena ribloggato — continua così!</p>
 
+<br>
+
+<p>{{random_info}}</p>
 
 <br>
 
