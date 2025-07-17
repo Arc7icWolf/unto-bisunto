@@ -61,6 +61,8 @@ def save_winners(winners):
     filename = "winners.csv"
     file_exists = os.path.isfile(filename)
 
+    winners = reversed(winners)
+
     with open(filename, "a", newline="", encoding="utf-8") as csvfile:
         fieldnames = ["num", "to", "amount"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -78,7 +80,7 @@ def contest_data(author, session):
             reader = csv.DictReader(csvfile)
             rows = list(reader)
             if rows:
-                last_index = int(rows[0]["num"])
+                last_index = int(rows[-1]["num"])
     else:
         last_index = 1
 
