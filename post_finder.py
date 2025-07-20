@@ -16,12 +16,9 @@ from stats import get_stats
 class Config:
     def __init__(self):
         # Get credentias from Secrets
-        key = "5HvuMLXsQPvDQHfS7n56CVNan42yFRZKtC5Ceyy9aDBGwSzQJ8m"
-        '''
         key = os.getenv("POSTING_KEY")
         if not key:
             raise ValueError("POSTING_KEY not found")
-        '''
 
         self.hive = Hive(keys=[key])
         self.account = "megaptera-marina"
