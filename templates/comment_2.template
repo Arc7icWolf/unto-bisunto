@@ -1,7 +1,8 @@
-<p>🚀 Ciao @{{target_account}}! Ho fatto il reblog della tua entry per <strong>#untobisunto</strong> — bel fatto!</p>
+<p>🚀 Ciao @{{target_account}}! Ho fatto il reblog della tua entry per <strong>#untobisunto</strong> — ben fatto!</p>
 
 <br>
 
+<p>Sapevi che...</p>
 <p>{{info}}</p>
 
 <br>
