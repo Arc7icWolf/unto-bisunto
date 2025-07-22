@@ -10,7 +10,7 @@ def total_prizes(reader: csv.DictReader) -> str:
         total += float(row["amount"].split()[0])
 
     return (
-        f"Sapevi che il contest **Unto&Bisunto** ha distribuito premi "
+        f"Il contest **Unto&Bisunto** ha distribuito premi "
         f"per un totale di {total:.3f} HIVE? Impressionante!"
     )
 
