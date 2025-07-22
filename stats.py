@@ -37,7 +37,7 @@ def most_rewarded(reader: csv.DictReader) -> str:
 def second_most_rewarded(reader: csv.DictReader) -> str:
     winners = all_winners(reader)
     return (
-        f"Sai chi è il secondo utente più premiato del contest **Unto&Bisunto**? E' @{winners[1]['to']}, "
+        f"Il secondo utente più premiato del contest **Unto&Bisunto** è @{winners[1]['to']}, "
         f"con {winners[1]['amount']} HIVE portati a casa! Complimenti :)"
     )
 
