@@ -10,7 +10,7 @@ def total_prizes(reader: csv.DictReader) -> str:
         total += float(row["amount"].split()[0])
 
     return (
-        f"Il contest **Unto&Bisunto** ha distribuito premi "
+        f"Il contest <b>Unto&Bisunto</b> ha distribuito premi "
         f"per un totale di {total:.3f} HIVE? Impressionante!"
     )
 
@@ -29,7 +29,7 @@ def all_winners(reader: csv.DictReader) -> list:
 def most_rewarded(reader: csv.DictReader) -> str:
     winners = all_winners(reader)
     return (
-        f"L'utente più premiato del contest **Unto&Bisunto** è... @{winners[0]['to']}, "
+        f"L'utente più premiato del contest <b>Unto&Bisunto</b> è... @{winners[0]['to']}, "
         f"con {winners[0]['amount']} HIVE vinti! Congratulazioni :)"
     )
 
@@ -37,7 +37,7 @@ def most_rewarded(reader: csv.DictReader) -> str:
 def second_most_rewarded(reader: csv.DictReader) -> str:
     winners = all_winners(reader)
     return (
-        f"Il secondo utente più premiato del contest **Unto&Bisunto** è @{winners[1]['to']}, "
+        f"Il secondo utente più premiato del contest <b>Unto&Bisunto</b> è @{winners[1]['to']}, "
         f"con {winners[1]['amount']} HIVE portati a casa! Complimenti :)"
     )
 
@@ -45,7 +45,7 @@ def second_most_rewarded(reader: csv.DictReader) -> str:
 def third_most_rewarded(reader: csv.DictReader) -> str:
     winners = all_winners(reader)
     return (
-        f"Il terzo maggior vincitore del contest **Unto&Bisunto** è @{winners[2]['to']}, "
+        f"Il terzo maggior vincitore del contest <b>Unto&Bisunto</b> è @{winners[2]['to']}, "
         f"grazie a {winners[2]['amount']} HIVE vinti! Un grandissimo risultato :)"
     )
 
@@ -53,7 +53,7 @@ def third_most_rewarded(reader: csv.DictReader) -> str:
 def participants(reader: csv.DictReader) -> str:
     winners = all_winners(reader)
     return (
-        f"Dalla sua nascita il contest **Unto&Bisunto** ha visto la partecipazione di {len(winners)} utenti... "
+        f"Dalla sua nascita il contest <b>Unto&Bisunto</b> ha visto la partecipazione di {len(winners)} utenti... "
         f"e tu sei uno di loro!"
     )
 
