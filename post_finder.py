@@ -120,10 +120,11 @@ def unto_bisunto_posts(session: requests.Session, cfg: Config):
         data = (
             f'{{"jsonrpc":"2.0", "method":"bridge.get_ranked_posts", '
             f'"params":{{"sort":"created","tag":"hive-146620","observer":"", '
-            f'"limit": 100, "start_author":"{author}", "start_permlink":"{permlink}"}}, '
+            f'"limit": 20, "start_author":"{author}", "start_permlink":"{permlink}"}}, '
             f'"id":1}}'
         )
         posts = get_response(data, session)
+
         for post in posts:
             author = post["author"]
             permlink = post["permlink"]
